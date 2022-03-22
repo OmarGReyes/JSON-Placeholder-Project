@@ -19,6 +19,7 @@ final class PostListPresenter  {
   private var postIdTaped: Int?
   private var postDescription: String?
   private var isFavoritePost: Bool = false
+  private var favoritesDisplayed: Bool = false
 
   private func presentPostDetail() {
     guard let userInfo: User = userInfo,
@@ -33,11 +34,13 @@ final class PostListPresenter  {
   }
 
   private func showFavorites() {
+    favoritesDisplayed = true
     let favorites = PostListProvider(posts: postList).favoritePosts()
     view?.updateList(posts: favorites)
   }
 
   private func showAll() {
+    favoritesDisplayed = false
     view?.updateList(posts: postList)
   }
 }
@@ -76,7 +79,12 @@ extension PostListPresenter: PostListPresenterProtocol {
 
   func deletePostWithSwipe(postId: Int) {
     postList = PostListProvider(posts: postList).deletePost(postId: postId)
-    view?.updateList(posts: postList)
+    if favoritesDisplayed {
+      let favoritePosts: Posts = PostListProvider(posts: postList).favoritePosts()
+      view?.updateList(posts: favoritePosts)
+    } else {
+      view?.updateList(posts: postList)
+    }
   }
 }
 
